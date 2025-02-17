@@ -17,24 +17,25 @@ class NeoArk:
 
     def cartdrige_listener(self):
 
-        drives = []
+        cache = []
         
         while True:
 
-            cache = tb.get_drives()
+            drives = tb.get_drives()
 
-            if len(drives) != len(cache):
-                os.system("cls")
-                print(f"Drives updated\n\n{cache}")
-                drives = cache
-                if self.app_name.upper() in drives:
+            if len(drives) > 0 and len(cache) == 0:
+                #os.system("cls")
+                cache = drives
+                print(f"Drives updated\n\n{drives}")
+
+                try:
                     
-                    file_data = tb.read_file(tb.get_drive_caption(self.app_name.upper()) + "/DATA.ark")
+                    file_data = tb.read_file(drives["caption"] + "DATA.ark")
 
                     data_lines = file_data.split("\n")
 
                     self.info["Status"] = "Cartdrige detected"
-                    self.info["Device"] = tb.get_drive_caption(self.app_name.upper()) + "/"
+                    self.info["Device"] = drives["caption"] + "/"
                     self.info["Game"] = data_lines[2].split("=")[1]
                     self.info["Core"] = data_lines[3].split("=")[1]
                     self.info["Console"] = data_lines[4].split("=")[1]
@@ -42,9 +43,13 @@ class NeoArk:
                     #tb.write_file("C:\NEO-ARK\DATA.ark", self.info)
 
                     tb.run_game(self.info["Core"], self.info["Game"])
+                except:
+                    print("Error al leer la informacion del cartucho")
 
-                else:
-                    self.info["Status"] = "No cartdrige"
+            else:
+                if len(drives) == 0:
+                    cache = []
+                self.info["Status"] = "No cartdrige"
 
             time.sleep(1)
 
